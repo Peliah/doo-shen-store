@@ -4,7 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import { DatabaseProvider } from '@/contexts/DatabaseContext';
 import { ThemeProvider as CustomThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { UserProvider } from '@/contexts/UserContext';
 import { AppStorage } from '@/utils/storage/app';
 
 export const unstable_settings = {
@@ -13,9 +15,13 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   return (
-    <CustomThemeProvider>
-      <ThemeProviderWrapper />
-    </CustomThemeProvider>
+    <DatabaseProvider>
+      <UserProvider>
+        <CustomThemeProvider>
+          <ThemeProviderWrapper />
+        </CustomThemeProvider>
+      </UserProvider>
+    </DatabaseProvider>
   );
 }
 

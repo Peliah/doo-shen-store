@@ -1,6 +1,8 @@
 import { NeoBrutalismButton, NeoBrutalismCard, NeoBrutalismInput, NeoBrutalismText } from '@/components/neo-brutalism';
 import { Colors } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useUser } from '@/contexts/UserContext';
+import { findOrCreateUser, getStoresByUser } from '@/utils/database';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
@@ -9,14 +11,36 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const UsernameSetup = () => {
     const { isDark } = useTheme();
+    const { setCurrentUser } = useUser();
     const [username, setUsername] = useState('');
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (!username.trim()) {
             Alert.alert('Error', 'Please enter a username');
             return;
         }
-        router.push('/(onboarding)/store-setup');
+
+        try {
+            // Find or create user
+            const user = await findOrCreateUser(username.trim());
+
+            // Store current user in context
+            setCurrentUser(user);
+
+            // Check if user has existing stores
+            const existingStores = await getStoresByUser(user.id!);
+
+            if (existingStores.length > 0) {
+                // User has stores, go directly to main app
+                router.replace('/(tabs)');
+            } else {
+                // User has no stores, go to store setup
+                router.push('/(onboarding)/store-setup');
+            }
+        } catch (error) {
+            console.error('Error handling user:', error);
+            Alert.alert('Error', 'Failed to process username. Please try again.');
+        }
     };
 
     const handleBack = () => {

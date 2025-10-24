@@ -1,6 +1,8 @@
 import { NeoBrutalismButton, NeoBrutalismCard, NeoBrutalismInput, NeoBrutalismText } from '@/components/neo-brutalism';
 import { Colors } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useUser } from '@/contexts/UserContext';
+import { createStore } from '@/utils/database';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
@@ -9,17 +11,37 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const StoreSetup = () => {
     const { isDark } = useTheme();
+    const { currentUser } = useUser();
     const [storeName, setStoreName] = useState('');
     const [storeType, setStoreType] = useState('');
     const [location, setLocation] = useState('');
 
-    const handleComplete = () => {
+    const handleComplete = async () => {
         if (!storeName.trim() || !storeType.trim() || !location.trim()) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
-        // Navigate to dashboard after setup completion
-        router.replace('/(tabs)');
+
+        if (!currentUser) {
+            Alert.alert('Error', 'User not found. Please go back and enter your name.');
+            return;
+        }
+
+        try {
+            // Save store to database with user association
+            await createStore({
+                user_id: currentUser.id!,
+                name: storeName.trim(),
+                type: storeType.trim(),
+                location: location.trim()
+            });
+
+            // Navigate to main app after successful store creation
+            router.replace('/(tabs)');
+        } catch (error) {
+            console.error('Error creating store:', error);
+            Alert.alert('Error', 'Failed to create store. Please try again.');
+        }
     };
 
     const handleBack = () => {
