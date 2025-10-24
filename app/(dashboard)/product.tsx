@@ -1,3 +1,4 @@
+import { CreateProductModal } from '@/components/home-screen/CreateProductModal';
 import { NeoBrutalismButton, NeoBrutalismText } from '@/components/neo-brutalism';
 import {
   ProductActionSection,
@@ -22,6 +23,7 @@ export default function ProductDetailScreen() {
   const { productId } = useLocalSearchParams<{ productId: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const loadProduct = useCallback(async () => {
     try {
@@ -45,9 +47,16 @@ export default function ProductDetailScreen() {
   }, [productId, loadProduct]);
 
   const handleEdit = () => {
-    showAlert('Edit Product', 'Edit functionality coming soon!', [
-      { text: 'OK', onPress: () => { } }
-    ]);
+    setShowEditModal(true);
+  };
+
+  const handleProductUpdated = () => {
+    loadProduct(); // Reload product after update
+    setShowEditModal(false);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
   };
 
   const handleDelete = () => {
@@ -125,6 +134,14 @@ export default function ProductDetailScreen() {
         <ProductMetadataSection product={product} />
         <ProductActionSection onEdit={handleEdit} onDelete={handleDelete} />
       </ScrollView>
+
+      {/* Edit Product Modal */}
+      <CreateProductModal
+        visible={showEditModal}
+        onClose={handleCloseEditModal}
+        onProductCreated={handleProductUpdated}
+        editingProduct={product}
+      />
     </SafeAreaView>
   );
 }

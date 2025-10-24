@@ -3,10 +3,10 @@ import { Colors } from '@/constants/theme';
 import { useAlert } from '@/contexts/AlertContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
-import { createProduct } from '@/utils/database';
+import { createProduct, Product, updateProduct } from '@/utils/database';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,17 +14,20 @@ interface CreateProductModalProps {
     visible: boolean;
     onClose: () => void;
     onProductCreated: () => void;
+    editingProduct?: Product | null;
 }
 
 export const CreateProductModal: React.FC<CreateProductModalProps> = ({
     visible,
     onClose,
     onProductCreated,
+    editingProduct,
 }) => {
     const { isDark } = useTheme();
     const { currentUser } = useUser();
     const { showAlert } = useAlert();
     const [loading, setLoading] = useState(false);
+    const isEditing = !!editingProduct;
 
     // Form state
     const [formData, setFormData] = useState({
@@ -36,6 +39,30 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
     });
 
     const [imageUri, setImageUri] = useState<string | null>(null);
+
+    // Populate form when editing
+    useEffect(() => {
+        if (editingProduct) {
+            setFormData({
+                name: editingProduct.name || '',
+                description: editingProduct.description || '',
+                price: editingProduct.price?.toString() || '',
+                quantity: editingProduct.quantity?.toString() || '',
+                category: editingProduct.category || '',
+            });
+            setImageUri(editingProduct.image_url || null);
+        } else {
+            // Reset form for new product
+            setFormData({
+                name: '',
+                description: '',
+                price: '',
+                quantity: '',
+                category: '',
+            });
+            setImageUri(null);
+        }
+    }, [editingProduct]);
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -132,28 +159,46 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
         try {
             setLoading(true);
 
-            // For now, we'll use the first store of the user
-            // Later we can add store selection
-            const storeId = 1; // This should be dynamic based on user's stores
+            if (isEditing && editingProduct?.id) {
+                // Update existing product
+                await updateProduct(editingProduct.id, {
+                    name: formData.name.trim(),
+                    description: formData.description.trim() || undefined,
+                    price: parseFloat(formData.price),
+                    quantity: parseInt(formData.quantity),
+                    category: formData.category.trim() || undefined,
+                    image_url: imageUri || undefined,
+                });
 
-            await createProduct({
-                store_id: storeId,
-                name: formData.name.trim(),
-                description: formData.description.trim() || undefined,
-                price: parseFloat(formData.price),
-                quantity: parseInt(formData.quantity),
-                category: formData.category.trim() || undefined,
-                image_url: imageUri || undefined,
-            });
+                showAlert('Success', 'Product updated successfully!', [
+                    { text: 'OK', onPress: () => { } }
+                ]);
+            } else {
+                // Create new product
+                // For now, we'll use the first store of the user
+                // Later we can add store selection
+                const storeId = 1; // This should be dynamic based on user's stores
 
-            showAlert('Success', 'Product created successfully!', [
-                { text: 'OK', onPress: () => { } }
-            ]);
+                await createProduct({
+                    store_id: storeId,
+                    name: formData.name.trim(),
+                    description: formData.description.trim() || undefined,
+                    price: parseFloat(formData.price),
+                    quantity: parseInt(formData.quantity),
+                    category: formData.category.trim() || undefined,
+                    image_url: imageUri || undefined,
+                });
+
+                showAlert('Success', 'Product created successfully!', [
+                    { text: 'OK', onPress: () => { } }
+                ]);
+            }
+
             onProductCreated();
             handleClose();
         } catch (error) {
-            console.error('Error creating product:', error);
-            showAlert('Error', 'Failed to create product', [
+            console.error('Error saving product:', error);
+            showAlert('Error', `Failed to ${isEditing ? 'update' : 'create'} product`, [
                 { text: 'OK', onPress: () => { } }
             ]);
         } finally {
@@ -188,7 +233,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                                 style={styles.closeButton}
                             />
                             <NeoBrutalismText variant="heading" color="primary" style={styles.title}>
-                                Add Product
+                                {isEditing ? 'Edit Product' : 'Add Product'}
                             </NeoBrutalismText>
                             <View style={styles.placeholder} />
                         </View>
@@ -305,7 +350,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                             style={styles.button}
                         />
                         <NeoBrutalismButton
-                            title={loading ? "Creating..." : "Create Product"}
+                            title={loading ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update Product" : "Create Product")}
                             onPress={handleSubmit}
                             variant="primary"
                             size="lg"
