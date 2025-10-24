@@ -32,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
 
     const handlePress = () => {
         if (product.id) {
-            router.push(`/(tabs)/product?productId=${product.id}`);
+            router.push(`/(dashboard)/product?productId=${product.id}`);
         }
     };
 
