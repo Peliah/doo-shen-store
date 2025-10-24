@@ -28,8 +28,14 @@ export const initializeDatabase = async (): Promise<void> => {
         const storesTableInfo = database.getAllSync("PRAGMA table_info(stores)");
         const hasUserIdColumn = storesTableInfo.some((column: any) => column.name === 'user_id');
 
-        if (!hasUserIdColumn) {
-            // Drop and recreate stores table with user_id
+        // Check if products table has old columns that need to be removed
+        const productsTableInfo = database.getAllSync("PRAGMA table_info(products)");
+        const hasOldColumns = productsTableInfo.some((column: any) =>
+            column.name === 'sku' || column.name === 'cost' || column.name === 'min_quantity'
+        );
+
+        if (!hasUserIdColumn || hasOldColumns) {
+            // Drop and recreate tables with updated schema
             database.execSync('DROP TABLE IF EXISTS stores;');
             database.execSync('DROP TABLE IF EXISTS products;');
             database.execSync('DROP TABLE IF EXISTS transactions;');
@@ -57,11 +63,8 @@ export const initializeDatabase = async (): Promise<void> => {
         store_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         description TEXT,
-        sku TEXT UNIQUE,
         price REAL NOT NULL DEFAULT 0,
-        cost REAL NOT NULL DEFAULT 0,
         quantity INTEGER NOT NULL DEFAULT 0,
-        min_quantity INTEGER DEFAULT 0,
         category TEXT,
         image_url TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

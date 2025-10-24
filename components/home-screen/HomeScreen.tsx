@@ -5,6 +5,7 @@ import { getAllProducts, Product } from '@/utils/database';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { CreateProductModal } from './CreateProductModal';
 import { Header } from './Header';
 import { ProductGrid } from './ProductGrid';
 import { UtilsSection } from './UtilsSection';
@@ -16,6 +17,7 @@ export const HomeScreen: React.FC = () => {
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     const loadProducts = useCallback(async () => {
         try {
@@ -46,7 +48,6 @@ export const HomeScreen: React.FC = () => {
         } else {
             const filtered = products.filter(product =>
                 product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                product.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 product.category?.toLowerCase().includes(searchQuery.toLowerCase())
             );
             setFilteredProducts(filtered);
@@ -70,7 +71,15 @@ export const HomeScreen: React.FC = () => {
     };
 
     const handleAddProduct = () => {
-        Alert.alert('Add Product', 'Add product form coming soon!');
+        setShowCreateModal(true);
+    };
+
+    const handleProductCreated = () => {
+        loadProducts(); // Reload products after creation
+    };
+
+    const handleCloseModal = () => {
+        setShowCreateModal(false);
     };
 
     const handleMenuPress = () => {
@@ -106,6 +115,13 @@ export const HomeScreen: React.FC = () => {
                     loading={loading}
                 />
             </View>
+
+            {/* Create Product Modal */}
+            <CreateProductModal
+                visible={showCreateModal}
+                onClose={handleCloseModal}
+                onProductCreated={handleProductCreated}
+            />
         </SafeAreaView>
     );
 };

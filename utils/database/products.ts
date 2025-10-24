@@ -5,11 +5,8 @@ export interface Product {
     store_id: number;
     name: string;
     description?: string;
-    sku?: string;
     price: number;
-    cost: number;
     quantity: number;
-    min_quantity?: number;
     category?: string;
     image_url?: string;
     created_at?: string;
@@ -22,17 +19,14 @@ export const createProduct = (product: Omit<Product, 'id' | 'created_at' | 'upda
             const db = getDatabase();
 
             const result = db.runSync(
-                `INSERT INTO products (store_id, name, description, sku, price, cost, quantity, min_quantity, category, image_url) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                `INSERT INTO products (store_id, name, description, price, quantity, category, image_url) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
                 [
                     product.store_id,
                     product.name,
                     product.description || null,
-                    product.sku || null,
                     product.price,
-                    product.cost,
                     product.quantity,
-                    product.min_quantity || 0,
                     product.category || null,
                     product.image_url || null
                 ]
@@ -105,25 +99,13 @@ export const updateProduct = (id: number, product: Partial<Product>): Promise<vo
                 fields.push('description = ?');
                 values.push(product.description);
             }
-            if (product.sku !== undefined) {
-                fields.push('sku = ?');
-                values.push(product.sku);
-            }
             if (product.price !== undefined) {
                 fields.push('price = ?');
                 values.push(product.price);
             }
-            if (product.cost !== undefined) {
-                fields.push('cost = ?');
-                values.push(product.cost);
-            }
             if (product.quantity !== undefined) {
                 fields.push('quantity = ?');
                 values.push(product.quantity);
-            }
-            if (product.min_quantity !== undefined) {
-                fields.push('min_quantity = ?');
-                values.push(product.min_quantity);
             }
             if (product.category !== undefined) {
                 fields.push('category = ?');

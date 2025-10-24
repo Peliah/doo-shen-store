@@ -21,13 +21,13 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
     const { isDark } = useTheme();
 
-    const getStockStatus = (quantity: number, minQuantity: number = 0) => {
+    const getStockStatus = (quantity: number) => {
         if (quantity === 0) return { status: 'out', color: '#ff4444', text: 'Out of Stock' };
-        if (quantity <= minQuantity) return { status: 'low', color: '#ffaa00', text: 'Low Stock' };
+        if (quantity <= 5) return { status: 'low', color: '#ffaa00', text: 'Low Stock' };
         return { status: 'good', color: '#44ff44', text: 'In Stock' };
     };
 
-    const stockStatus = getStockStatus(product.quantity, product.min_quantity);
+    const stockStatus = getStockStatus(product.quantity);
 
     return (
         <TouchableOpacity onPress={onPress} style={styles.cardContainer}>
@@ -45,10 +45,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
                 <View style={styles.productInfo}>
                     <NeoBrutalismText variant="subheading" color="primary" style={styles.productName}>
                         {product.name}
-                    </NeoBrutalismText>
-
-                    <NeoBrutalismText variant="body" color="secondary" style={styles.productSku}>
-                        SKU: {product.sku || 'N/A'}
                     </NeoBrutalismText>
 
                     <View style={styles.priceContainer}>
@@ -178,10 +174,6 @@ const styles = StyleSheet.create({
     },
     productName: {
         fontWeight: '600',
-        marginBottom: 4,
-    },
-    productSku: {
-        fontSize: 12,
         marginBottom: 8,
     },
     priceContainer: {
