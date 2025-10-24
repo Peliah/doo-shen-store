@@ -3,6 +3,7 @@ import { Colors } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Product } from '@/utils/database';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -29,8 +30,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
 
     const stockStatus = getStockStatus(product.quantity);
 
+    const handlePress = () => {
+        if (product.id) {
+            router.push(`/(tabs)/product?productId=${product.id}`);
+        }
+    };
+
     return (
-        <TouchableOpacity onPress={onPress} style={styles.cardContainer}>
+        <TouchableOpacity onPress={handlePress} style={styles.cardContainer}>
             <NeoBrutalismCard variant="default" padding="base" style={styles.card}>
                 {/* Product Image Placeholder */}
                 <View style={[styles.imageContainer, { backgroundColor: isDark ? Colors.dark.cardBackground : Colors.light.cardBackground }]}>

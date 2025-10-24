@@ -67,7 +67,8 @@ export const HomeScreen: React.FC = () => {
     };
 
     const handleProductPress = (product: Product) => {
-        Alert.alert('Product', `Selected: ${product.name}`);
+        // Navigation is now handled directly in ProductCard
+        // This function is kept for compatibility but not used
     };
 
     const handleAddProduct = () => {
