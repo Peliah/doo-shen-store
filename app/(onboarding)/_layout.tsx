@@ -6,7 +6,7 @@ export default function OnboardingLayout() {
         <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="username-setup" options={{ headerShown: false }} />
-            <Stack.Screen name="tech-interests" options={{ headerShown: false }} />
+            <Stack.Screen name="store-setup" options={{ headerShown: false }} />
         </Stack>
     );
 }
