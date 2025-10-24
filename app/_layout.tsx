@@ -4,6 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import { GlobalAlert } from '@/components/GlobalAlert';
+import { AlertProvider } from '@/contexts/AlertContext';
 import { DatabaseProvider } from '@/contexts/DatabaseContext';
 import { ThemeProvider as CustomThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { UserProvider } from '@/contexts/UserContext';
@@ -17,9 +19,11 @@ export default function RootLayout() {
   return (
     <DatabaseProvider>
       <UserProvider>
-        <CustomThemeProvider>
-          <ThemeProviderWrapper />
-        </CustomThemeProvider>
+        <AlertProvider>
+          <CustomThemeProvider>
+            <ThemeProviderWrapper />
+          </CustomThemeProvider>
+        </AlertProvider>
       </UserProvider>
     </DatabaseProvider>
   );
@@ -59,6 +63,7 @@ function ThemeProviderWrapper() {
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />
+      <GlobalAlert />
     </ThemeProvider>
   );
 }

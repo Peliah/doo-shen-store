@@ -1,5 +1,6 @@
 import { NeoBrutalismText } from '@/components/neo-brutalism';
 import { Colors } from '@/constants/theme';
+import { useAlert } from '@/contexts/AlertContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
@@ -12,6 +13,22 @@ interface ProductActionSectionProps {
 
 export const ProductActionSection: React.FC<ProductActionSectionProps> = ({ onEdit, onDelete }) => {
     const { isDark } = useTheme();
+    const { showAlert } = useAlert();
+
+    const handleDelete = () => {
+        showAlert(
+            'Delete Product',
+            'Are you sure you want to delete this product? This action cannot be undone.',
+            [
+                { text: 'Cancel', style: 'cancel', onPress: () => { } },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: onDelete,
+                },
+            ]
+        );
+    };
 
     return (
         <View style={styles.actionSection}>
@@ -21,8 +38,9 @@ export const ProductActionSection: React.FC<ProductActionSectionProps> = ({ onEd
                     style={[
                         styles.actionButton,
                         styles.editButton,
-                        { backgroundColor: isDark ? Colors.dark.primary : Colors.light.primary }
+                        { backgroundColor: isDark ? Colors.dark.cardBackground : Colors.light.cardBackground }
                     ]}
+                    activeOpacity={0.8}
                 >
                     <Ionicons
                         name="create-outline"
@@ -36,12 +54,13 @@ export const ProductActionSection: React.FC<ProductActionSectionProps> = ({ onEd
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={onDelete}
+                    onPress={handleDelete}
                     style={[
                         styles.actionButton,
                         styles.deleteButton,
-                        { backgroundColor: isDark ? Colors.dark.cardBackground : Colors.light.cardBackground }
+                        { backgroundColor: isDark ? Colors.dark.background : Colors.light.background }
                     ]}
+                    activeOpacity={0.8}
                 >
                     <Ionicons
                         name="trash-outline"

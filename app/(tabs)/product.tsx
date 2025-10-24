@@ -8,15 +8,17 @@ import {
   ProductPricingSection,
 } from '@/components/product-detail';
 import { Colors } from '@/constants/theme';
+import { useAlert } from '@/contexts/AlertContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { deleteProduct, getProduct, Product } from '@/utils/database';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProductDetailScreen() {
   const { isDark } = useTheme();
+  const { showAlert } = useAlert();
   const { productId } = useLocalSearchParams<{ productId: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,11 +30,13 @@ export default function ProductDetailScreen() {
       setProduct(productData);
     } catch (error) {
       console.error('Error loading product:', error);
-      Alert.alert('Error', 'Failed to load product details');
+      showAlert('Error', 'Failed to load product details', [
+        { text: 'OK', onPress: () => { } }
+      ]);
     } finally {
       setLoading(false);
     }
-  }, [productId]);
+  }, [productId, showAlert]);
 
   useEffect(() => {
     if (productId) {
@@ -41,15 +45,17 @@ export default function ProductDetailScreen() {
   }, [productId, loadProduct]);
 
   const handleEdit = () => {
-    Alert.alert('Edit Product', 'Edit functionality coming soon!');
+    showAlert('Edit Product', 'Edit functionality coming soon!', [
+      { text: 'OK', onPress: () => { } }
+    ]);
   };
 
   const handleDelete = () => {
-    Alert.alert(
+    showAlert(
       'Delete Product',
       'Are you sure you want to delete this product? This action cannot be undone.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel', onPress: () => { } },
         {
           text: 'Delete',
           style: 'destructive',
@@ -63,12 +69,15 @@ export default function ProductDetailScreen() {
     try {
       if (product?.id) {
         await deleteProduct(product.id);
-        Alert.alert('Success', 'Product deleted successfully!');
-        router.back();
+        showAlert('Success', 'Product deleted successfully!', [
+          { text: 'OK', onPress: () => router.back() }
+        ]);
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      Alert.alert('Error', 'Failed to delete product');
+      showAlert('Error', 'Failed to delete product', [
+        { text: 'OK', onPress: () => { } }
+      ]);
     }
   };
 
