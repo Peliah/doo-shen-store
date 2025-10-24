@@ -19,29 +19,29 @@ export default function OnboardingScreen() {
             <View style={styles.content}>
                 <Animated.View entering={FadeInRight.delay(200)} style={styles.header}>
                     <Text style={[styles.logo, { color: isDark ? Colors.dark.text : Colors.light.text }]}>
-                        Doo Shen Trivia
+                        Doo-Shen-Store
                     </Text>
                     <NeoBrutalismText variant="heading" color="primary" style={styles.title}>
-                        Test Your Tech Knowledge
+                        Manage Your Inventory Like a Pro
                     </NeoBrutalismText>
                 </Animated.View>
 
                 <Animated.View entering={FadeInUp.delay(400)} style={styles.mainContent}>
                     <NeoBrutalismCard variant="default" padding="lg" style={styles.featureCard}>
                         <NeoBrutalismText variant="subheading" color="primary" style={styles.featureTitle}>
-                            10 Questions
+                            📦 Track Products
                         </NeoBrutalismText>
                         <NeoBrutalismText variant="body" color="secondary" style={styles.featureDescription}>
-                            Quick, focused quizzes
+                            Monitor stock levels and quantities
                         </NeoBrutalismText>
                     </NeoBrutalismCard>
 
                     <NeoBrutalismCard variant="accent" padding="lg" style={styles.featureCard}>
                         <NeoBrutalismText variant="subheading" color="primary" style={styles.featureTitle}>
-                            Instant Results
+                            📊 Real-time Analytics
                         </NeoBrutalismText>
                         <NeoBrutalismText variant="body" color="primary" style={styles.featureDescription}>
-                            Immediate feedback
+                            Get insights on your inventory
                         </NeoBrutalismText>
                     </NeoBrutalismCard>
                 </Animated.View>
