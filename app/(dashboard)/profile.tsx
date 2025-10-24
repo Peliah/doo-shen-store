@@ -1,21 +1,23 @@
 import { NeoBrutalismButton, NeoBrutalismCard, NeoBrutalismText } from '@/components/neo-brutalism';
 import { Colors } from '@/constants/theme';
+import { useAlert } from '@/contexts/AlertContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { AppStorage } from '@/utils/storage/app';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
     const { isDark } = useTheme();
+    const { showAlert } = useAlert();
 
     const handleClearState = () => {
-        Alert.alert(
+        showAlert(
             'Clear App State',
             'This will reset all app data including user profile, quiz history, and settings. You will need to go through onboarding again. Are you sure?',
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: 'Cancel', style: 'cancel', onPress: () => { } },
                 {
                     text: 'Clear All Data',
                     style: 'destructive',
@@ -26,7 +28,9 @@ export default function ProfileScreen() {
                             router.replace('/(onboarding)' as any);
                         } catch (error) {
                             console.error('Error clearing app state:', error);
-                            Alert.alert('Error', 'Failed to clear app data. Please try again.');
+                            showAlert('Error', 'Failed to clear app data. Please try again.', [
+                                { text: 'OK', onPress: () => { } }
+                            ]);
                         }
                     }
                 }

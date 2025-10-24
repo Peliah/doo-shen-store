@@ -1,22 +1,26 @@
 import { NeoBrutalismButton, NeoBrutalismCard, NeoBrutalismInput, NeoBrutalismText } from '@/components/neo-brutalism';
 import { Colors } from '@/constants/theme';
+import { useAlert } from '@/contexts/AlertContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { findOrCreateUser, getStoresByUser } from '@/utils/database';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInUp, SlideInRight } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const UsernameSetup = () => {
     const { isDark } = useTheme();
     const { setCurrentUser } = useUser();
+    const { showAlert } = useAlert();
     const [username, setUsername] = useState('');
 
     const handleContinue = async () => {
         if (!username.trim()) {
-            Alert.alert('Error', 'Please enter a username');
+            showAlert('Error', 'Please enter a username', [
+                { text: 'OK', onPress: () => { } }
+            ]);
             return;
         }
 
@@ -39,7 +43,9 @@ const UsernameSetup = () => {
             }
         } catch (error) {
             console.error('Error handling user:', error);
-            Alert.alert('Error', 'Failed to process username. Please try again.');
+            showAlert('Error', 'Failed to process username. Please try again.', [
+                { text: 'OK', onPress: () => { } }
+            ]);
         }
     };
 

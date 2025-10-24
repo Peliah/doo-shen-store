@@ -1,9 +1,10 @@
 import { Colors } from '@/constants/theme';
+import { useAlert } from '@/contexts/AlertContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { getAllProducts, Product } from '@/utils/database';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CreateProductModal } from './CreateProductModal';
 import { Header } from './Header';
@@ -13,6 +14,7 @@ import { UtilsSection } from './UtilsSection';
 export const HomeScreen: React.FC = () => {
     const { isDark } = useTheme();
     const { currentUser } = useUser();
+    const { showAlert } = useAlert();
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -30,11 +32,13 @@ export const HomeScreen: React.FC = () => {
             }
         } catch (error) {
             console.error('Error loading products:', error);
-            Alert.alert('Error', 'Failed to load products');
+            showAlert('Error', 'Failed to load products', [
+                { text: 'OK', onPress: () => { } }
+            ]);
         } finally {
             setLoading(false);
         }
-    }, [currentUser]);
+    }, [currentUser, showAlert]);
 
     // Load products on component mount
     useEffect(() => {
@@ -59,11 +63,15 @@ export const HomeScreen: React.FC = () => {
     };
 
     const handleFilterPress = () => {
-        Alert.alert('Filter', 'Filter options coming soon!');
+        showAlert('Filter', 'Filter options coming soon!', [
+            { text: 'OK', onPress: () => { } }
+        ]);
     };
 
     const handleSortPress = () => {
-        Alert.alert('Sort', 'Sort options coming soon!');
+        showAlert('Sort', 'Sort options coming soon!', [
+            { text: 'OK', onPress: () => { } }
+        ]);
     };
 
     const handleProductPress = (product: Product) => {
@@ -84,11 +92,15 @@ export const HomeScreen: React.FC = () => {
     };
 
     const handleMenuPress = () => {
-        Alert.alert('Menu', 'Menu options coming soon!');
+        showAlert('Menu', 'Menu options coming soon!', [
+            { text: 'OK', onPress: () => { } }
+        ]);
     };
 
     const handleNotificationPress = () => {
-        Alert.alert('Notifications', 'No new notifications');
+        showAlert('Notifications', 'No new notifications', [
+            { text: 'OK', onPress: () => { } }
+        ]);
     };
 
     return (

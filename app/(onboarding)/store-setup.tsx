@@ -1,30 +1,36 @@
 import { NeoBrutalismButton, NeoBrutalismCard, NeoBrutalismInput, NeoBrutalismText } from '@/components/neo-brutalism';
 import { Colors } from '@/constants/theme';
+import { useAlert } from '@/contexts/AlertContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { createStore } from '@/utils/database';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeInUp, SlideInRight } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const StoreSetup = () => {
     const { isDark } = useTheme();
     const { currentUser } = useUser();
+    const { showAlert } = useAlert();
     const [storeName, setStoreName] = useState('');
     const [storeType, setStoreType] = useState('');
     const [location, setLocation] = useState('');
 
     const handleComplete = async () => {
         if (!storeName.trim() || !storeType.trim() || !location.trim()) {
-            Alert.alert('Error', 'Please fill in all fields');
+            showAlert('Error', 'Please fill in all fields', [
+                { text: 'OK', onPress: () => { } }
+            ]);
             return;
         }
 
         if (!currentUser) {
-            Alert.alert('Error', 'User not found. Please go back and enter your name.');
+            showAlert('Error', 'User not found. Please go back and enter your name.', [
+                { text: 'OK', onPress: () => { } }
+            ]);
             return;
         }
 
@@ -41,7 +47,9 @@ const StoreSetup = () => {
             router.replace('/(tabs)');
         } catch (error) {
             console.error('Error creating store:', error);
-            Alert.alert('Error', 'Failed to create store. Please try again.');
+            showAlert('Error', 'Failed to create store. Please try again.', [
+                { text: 'OK', onPress: () => { } }
+            ]);
         }
     };
 

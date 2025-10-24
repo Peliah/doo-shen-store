@@ -1,12 +1,13 @@
 import { NeoBrutalismButton, NeoBrutalismCard, NeoBrutalismInput, NeoBrutalismText } from '@/components/neo-brutalism';
 import { Colors } from '@/constants/theme';
+import { useAlert } from '@/contexts/AlertContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUser } from '@/contexts/UserContext';
 import { createProduct } from '@/utils/database';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
-import { Alert, Image, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface CreateProductModalProps {
@@ -22,6 +23,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
 }) => {
     const { isDark } = useTheme();
     const { currentUser } = useUser();
+    const { showAlert } = useAlert();
     const [loading, setLoading] = useState(false);
 
     // Form state
@@ -40,13 +42,13 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
     };
 
     const handleImagePicker = () => {
-        Alert.alert(
+        showAlert(
             'Select Image',
             'Choose an option',
             [
                 { text: 'Camera', onPress: () => pickImage('camera') },
                 { text: 'Gallery', onPress: () => pickImage('gallery') },
-                { text: 'Cancel', style: 'cancel' },
+                { text: 'Cancel', style: 'cancel', onPress: () => { } },
             ]
         );
     };
@@ -58,7 +60,9 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
             if (source === 'camera') {
                 const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
                 if (permissionResult.granted === false) {
-                    Alert.alert('Permission Required', 'Camera permission is required to take photos');
+                    showAlert('Permission Required', 'Camera permission is required to take photos', [
+                        { text: 'OK', onPress: () => { } }
+                    ]);
                     return;
                 }
                 result = await ImagePicker.launchCameraAsync({
@@ -70,7 +74,9 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
             } else {
                 const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
                 if (permissionResult.granted === false) {
-                    Alert.alert('Permission Required', 'Gallery permission is required to select images');
+                    showAlert('Permission Required', 'Gallery permission is required to select images', [
+                        { text: 'OK', onPress: () => { } }
+                    ]);
                     return;
                 }
                 result = await ImagePicker.launchImageLibraryAsync({
@@ -86,25 +92,35 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
             }
         } catch (error) {
             console.error('Error picking image:', error);
-            Alert.alert('Error', 'Failed to pick image');
+            showAlert('Error', 'Failed to pick image', [
+                { text: 'OK', onPress: () => { } }
+            ]);
         }
     };
 
     const validateForm = () => {
         if (!formData.name.trim()) {
-            Alert.alert('Validation Error', 'Product name is required');
+            showAlert('Validation Error', 'Product name is required', [
+                { text: 'OK', onPress: () => { } }
+            ]);
             return false;
         }
         if (!formData.price.trim() || isNaN(parseFloat(formData.price))) {
-            Alert.alert('Validation Error', 'Valid price is required');
+            showAlert('Validation Error', 'Valid price is required', [
+                { text: 'OK', onPress: () => { } }
+            ]);
             return false;
         }
         if (!formData.quantity.trim() || isNaN(parseInt(formData.quantity))) {
-            Alert.alert('Validation Error', 'Valid quantity is required');
+            showAlert('Validation Error', 'Valid quantity is required', [
+                { text: 'OK', onPress: () => { } }
+            ]);
             return false;
         }
         if (!currentUser) {
-            Alert.alert('Error', 'User not found');
+            showAlert('Error', 'User not found', [
+                { text: 'OK', onPress: () => { } }
+            ]);
             return false;
         }
         return true;
@@ -130,12 +146,16 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                 image_url: imageUri || undefined,
             });
 
-            Alert.alert('Success', 'Product created successfully!');
+            showAlert('Success', 'Product created successfully!', [
+                { text: 'OK', onPress: () => { } }
+            ]);
             onProductCreated();
             handleClose();
         } catch (error) {
             console.error('Error creating product:', error);
-            Alert.alert('Error', 'Failed to create product');
+            showAlert('Error', 'Failed to create product', [
+                { text: 'OK', onPress: () => { } }
+            ]);
         } finally {
             setLoading(false);
         }
